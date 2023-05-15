@@ -15,7 +15,7 @@ model User {
   email                String   @db.VarChar(255) @unique
   password             String   @db.VarChar(255)
   role                 Role     @default(USER)
-  refreshToken         String?  @db.VarChar(255)
+  refreshToken         String?  @db.VarChar(255) @unique
   code                 String?  @db.VarChar(255)
   resetPasswordExpires String?  @db.VarChar(255)
   createdAt            DateTime @default(now())
@@ -28,11 +28,10 @@ model Campaign {
   id        String   @id @db.VarChar(255) @default(uuid())
   title     String   @db.VarChar(255)
   admin     User?    @relation(fields: [adminId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  adminId   String?   @db.VarChar(255)
+  adminId   String?  @db.VarChar(255)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  files FilesOnCampaigns[]
+  files     FilesOnCampaigns[]
 }
 
 model FilesOnCampaigns {
@@ -50,7 +49,6 @@ model File {
   url       String   @db.VarChar(255)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   campaigns FilesOnCampaigns[]
 }
 
