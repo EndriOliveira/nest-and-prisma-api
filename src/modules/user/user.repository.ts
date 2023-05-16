@@ -8,6 +8,7 @@ import {
   NotFoundException,
   UnauthorizedException,
   ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { sign, verify } from 'jsonwebtoken';
 import { RefreshTokenDto } from '../auth/dto/refresh-token.dto';
@@ -17,15 +18,23 @@ export class UserRepository {
   constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
 
   private async hashPassword(password: string): Promise<string> {
-    const salt = await genSalt(10);
-    return await hash(password, salt);
+    try {
+      const salt = await genSalt(10);
+      return await hash(password, salt);
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   private async checkPassword(
     password: string,
     userPassword: string,
   ): Promise<boolean> {
-    return await compare(password, userPassword);
+    try {
+      return await compare(password, userPassword);
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   private validateRefreshToken(refreshToken: string) {
@@ -54,19 +63,23 @@ export class UserRepository {
   }
 
   async getUsers() {
-    const query = await this.prismaClient.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        cpf: true,
-        phone: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-    const users = formattedUsers(query);
-    return users;
+    try {
+      const query = await this.prismaClient.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          cpf: true,
+          phone: true,
+          email: true,
+          role: true,
+          createdAt: true,
+        },
+      });
+      const users = formattedUsers(query);
+      return users;
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   async createUser(createUserDto: CreateUserDto, role: UserRole) {
@@ -75,19 +88,22 @@ export class UserRepository {
       where: { OR: [{ cpf }, { email }] },
     });
     if (userExists.length > 0)
-      throw new ConflictException('User already exists');
-
-    return await this.prismaClient.user.create({
-      data: {
-        id: uuidV4(),
-        name,
-        cpf: formatCpf(cpf),
-        phone: formatPhone(phone),
-        email,
-        password: await this.hashPassword(password),
-        role,
-      },
-    });
+      throw new ConflictException('Email/CPF already exists');
+    try {
+      return await this.prismaClient.user.create({
+        data: {
+          id: uuidV4(),
+          name,
+          cpf: formatCpf(cpf),
+          phone: formatPhone(phone),
+          email,
+          password: await this.hashPassword(password),
+          role,
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   async checkCredentials(credentialsDto: CredentialsDto) {
@@ -102,22 +118,30 @@ export class UserRepository {
     if (!user) throw new NotFoundException('User not found');
     if (!(await this.checkPassword(password, user.password)))
       throw new UnauthorizedException('Invalid credentials');
-    const accessToken = sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '1h',
-    });
-    const refreshToken = sign(
-      { id: user.id },
-      process.env.REFRESH_TOKEN_SECRET,
-      {
-        expiresIn: '1d',
-      },
-    );
-    await this.prismaClient.user.update({
-      where: { id: user.id },
-      data: { refreshToken },
-    });
+    try {
+      const accessToken = sign(
+        { id: user.id },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: '1h',
+        },
+      );
+      const refreshToken = sign(
+        { id: user.id },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+          expiresIn: '1d',
+        },
+      );
+      await this.prismaClient.user.update({
+        where: { id: user.id },
+        data: { refreshToken },
+      });
 
-    return { token: accessToken, refreshToken };
+      return { token: accessToken, refreshToken };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   async refreshToken({ refreshToken }: RefreshTokenDto) {
@@ -129,9 +153,17 @@ export class UserRepository {
       },
     });
     if (!user) throw new NotFoundException('User not found');
-    const accessToken = sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '1h',
-    });
-    return { token: accessToken };
+    try {
+      const accessToken = sign(
+        { id: user.id },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: '1h',
+        },
+      );
+      return { token: accessToken };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 }

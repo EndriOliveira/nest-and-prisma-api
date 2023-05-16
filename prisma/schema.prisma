@@ -20,8 +20,8 @@ model User {
   resetPasswordExpires String?  @db.VarChar(255)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
-
-  campaigns Campaign[]
+  admin                Campaign[]
+  users                UsersOnCampaigns[]
 }
 
 model Campaign {
@@ -32,6 +32,7 @@ model Campaign {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   files     FilesOnCampaigns[]
+  users     UsersOnCampaigns[]
 }
 
 model FilesOnCampaigns {
@@ -50,6 +51,16 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   campaigns FilesOnCampaigns[]
+}
+
+model UsersOnCampaigns {
+  id         String   @id @db.VarChar(255) @default(uuid())
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  campaignId String   @db.VarChar(255)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId     String   @db.VarChar(255)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 enum Role {

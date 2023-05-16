@@ -1,20 +1,34 @@
-# API - CAMPAIGNS
+# Usuário
 
-#### FRAMEWORK: NEST.JS
-#### BANCO DE DADOS: POSTGRESQL
-#### ORM: PRISMA
+- Rota para alteração dos dados da sua conta (exigir senha)
+- Rota para deleção da conta, bem como as campanhas na qual está inserido (exigir senha)
+- Rota para sair de uma campanha
+- Rota para trocar senha
+- Rota Esqueci a senha + Rota para alterar senha
 
-* AUTENTICAÇÃO COM JWT
-* PRESENÇA DE ACCESS E REFRESH TOKEN
-* CRUD DE USUÁRIOS, CAMPANHAS E FOTOS
-* TRÊS TIPOS DE USUÁRIOS:
- * USER - CRIAÇÃO DE CONTA, LOGIN, E REGISTRO DE INTERESSE EM CAMPANHAS
- * ADMIN - LISTAGEM DE USUÁRIOS PRESENTES NA SUA CAMPANHA E REMOÇÃO DOS MESMOS
- * SUPERUSER - CRUD DE ADMINISTRADORES, CAMPANHAS E USUÁRIOS
-* USO DA BIBLIOTECA **ZOD** PARA VALIDAÇÃO DO BODY
+# Administrator
 
-### PERMISSÕES
+- Rota para listar pessoas que pediram permissão para se registrar na campanha
+- Rota para permitir pessoas à entrada na campanha
 
-* O USUÁRIO DEVE SER PERMITIDO CRIAR CONTA, LOGIN, RECUPERAR/ALTERAR SENHA E REGISTRAR INTERESSE
-* O ADMIN PODE FAZER LOGIN, RECUPERAR/ALTERAR SENHA, LISTAR AS PESSOAS PRESENTES NA SUA CAMPANHA, E REMOVÊ-LAS DA CAMPANHA
-* O SUPERUSER PODE CADASTRAR ADMINISTRADORES E CRIAR CAMPANHAS
+# SuperUser
+
+- Rota para alterar dados da campanha
+- Rota para deleção da campanha
+
+# Serviços
+
+- Criar serviço para enviar email (SendGrid)
+ - Enviar email para administrador ao ser feito uma solicitação 
+ - Enviar email para usuário aprovado
+ - Enviar email para código de troca de senha
+ - Enviar email para usuário removido
+- Criar Seed para criação do SuperUser
+
+# Banco de dados
+
+- Adicionar campo status para usuário aprovado à entrar na campanha
+
+# Testes Unitários
+# Implementar Swagger (Opcional)
+# Implementar Wiston (Opcional)
