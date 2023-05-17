@@ -11,6 +11,7 @@ import { validateRegisterAdmin } from './validators/validate-register-admin';
 import { User } from '@prisma/client';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { validateDeleteCampaignUser } from './validators/validate-delete-campaign-user';
+import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 
 @Injectable()
 export class CampaignService {
@@ -81,5 +82,20 @@ export class CampaignService {
       deleteCampaignUserDto,
       campaignId,
     );
+  }
+
+  async getCampaignsRequests(user: User) {
+    return await this.campaignRepository.getCampaignsRequests(user);
+  }
+
+  async approveCampaignInterest(user: User, requestId: string) {
+    return await this.campaignRepository.approveCampaignInterest(
+      user,
+      requestId,
+    );
+  }
+
+  async getUserRequests(user: User, query: FindRequestsQueryDto) {
+    return await this.campaignRepository.getUserRequests(user, query);
   }
 }

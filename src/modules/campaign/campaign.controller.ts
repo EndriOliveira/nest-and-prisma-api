@@ -5,7 +5,9 @@ import {
   Body,
   Param,
   Get,
+  Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UserRole } from '../user/enum/user-roles.enum';
@@ -17,6 +19,7 @@ import { RegisterAdminDto } from './dto/register-admin.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { User } from '@prisma/client';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
+import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 
 @Controller('campaign')
 export class CampaignController {
@@ -94,5 +97,32 @@ export class CampaignController {
       deleteCampaignUserDto,
       campaignId,
     );
+  }
+
+  @Get('/admin/requests')
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Role(UserRole.ADMIN_USER)
+  async getCampaignsUsers(@GetUser() user: User) {
+    return await this.campaignService.getCampaignsRequests(user);
+  }
+
+  @Get('/user/requests')
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Role(UserRole.NORMAL_USER)
+  async getRequestsUser(
+    @Query() query: FindRequestsQueryDto,
+    @GetUser() user: User,
+  ) {
+    return await this.campaignService.getUserRequests(user, query);
+  }
+
+  @Put('/admin/requests/:requestId')
+  @UseGuards(AuthGuard())
+  @Role(UserRole.ADMIN_USER)
+  async approveCampaignInterest(
+    @GetUser() user: User,
+    @Param('requestId') requestId: string,
+  ) {
+    return await this.campaignService.approveCampaignInterest(user, requestId);
   }
 }

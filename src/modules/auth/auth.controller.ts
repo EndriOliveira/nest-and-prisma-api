@@ -18,7 +18,7 @@ export class AuthController {
   async signUp(@Body() createUserDto: CreateUserDto) {
     return await this.authService.createUser(
       createUserDto,
-      UserRole.NORMAL_USER,
+      UserRole.UNREGISTERED,
     );
   }
 

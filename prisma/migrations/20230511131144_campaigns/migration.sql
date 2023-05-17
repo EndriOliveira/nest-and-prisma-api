@@ -1,6 +1,3 @@
--- CreateEnum
-CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN', 'SUPERUSER');
-
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -10,7 +7,7 @@ CREATE TABLE "User" (
     "phone" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "Role" NOT NULL DEFAULT 'USER',
+    "role" TEXT NOT NULL DEFAULT 'UNREGISTERED',
     "refreshToken" TEXT,
     "code" TEXT,
     "resetPasswordExpires" TEXT,

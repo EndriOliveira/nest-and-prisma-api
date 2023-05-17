@@ -6,10 +6,10 @@
 - Rota para trocar senha
 - Rota Esqueci a senha + Rota para alterar senha
 
-# Administrator
+# Campanha
 
-- Rota para listar pessoas que pediram permissão para se registrar na campanha
-- Rota para permitir pessoas à entrada na campanha
+- Rota para listar campanhas na qual eu estou cadastrado
+- Rota para listar campanhas na qual eu estou autorizado
 
 # SuperUser
 

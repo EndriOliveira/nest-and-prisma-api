@@ -12,9 +12,12 @@ import { UserRole } from '../user/enum/user-roles.enum';
 import {
   formattedAdminCampaigns,
   formattedCampaign,
+  formattedCampaignRequests,
   formattedCampaigns,
+  formattedUserRequests,
 } from 'src/utils/utils';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
+import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 
 export class CampaignRepository {
   constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
@@ -122,8 +125,6 @@ export class CampaignRepository {
       const campaigns = formattedAdminCampaigns(query);
       return campaigns;
     } catch (error) {
-      console.log(error);
-
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
@@ -208,6 +209,139 @@ export class CampaignRepository {
         message: 'User successfully deleted from campaign',
       };
     } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async getCampaignsRequests(user: User) {
+    try {
+      const query = await this.prismaClient.usersOnCampaigns.findMany({
+        where: { AND: [{ status: false }, { campaign: { adminId: user.id } }] },
+        include: {
+          campaign: {
+            include: {
+              admin: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  phone: true,
+                  role: true,
+                },
+              },
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+            },
+          },
+        },
+      });
+      if (query.length === 0)
+        return { message: 'There are no requests for you in this moment' };
+      const requests = formattedCampaignRequests(query);
+      return requests;
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async approveCampaignInterest(user: User, requestId: string) {
+    const request = await this.prismaClient.usersOnCampaigns.findFirst({
+      where: { id: requestId },
+      include: {
+        campaign: {
+          include: {
+            admin: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!request) throw new NotFoundException('Request does not exist');
+
+    if (
+      user.role !== UserRole.SUPER_USER &&
+      request.campaign.adminId !== user.id
+    )
+      throw new UnauthorizedException('User is not the admin of this campaign');
+
+    if (request.status) return { message: 'Request already approved' };
+
+    try {
+      await this.prismaClient.usersOnCampaigns.update({
+        where: { id: requestId },
+        data: {
+          status: true,
+        },
+      });
+      return {
+        message: 'User successfully approved on campaign',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async getUserRequests(user: User, query: FindRequestsQueryDto) {
+    const { status } = query;
+    let { limit, page, sort } = query;
+
+    sort = sort || JSON.stringify({ createdAt: 'desc' });
+    page = isNaN(page) ? 1 : page;
+    limit = isNaN(limit) || limit > 100 ? 100 : limit;
+
+    const keySort = sort ? Object.keys(JSON.parse(sort))[0] : undefined;
+    let valueSort = sort ? Object.values(JSON.parse(sort))[0] : undefined;
+    valueSort = `${valueSort}`.toLowerCase() == 'desc' ? 'desc' : 'asc';
+
+    try {
+      const requests = await this.prismaClient.usersOnCampaigns.findMany({
+        where: {
+          AND: [
+            { userId: user.id },
+            { status: status.toLowerCase() === 'false' ? false : true },
+          ],
+        },
+        include: {
+          campaign: {
+            include: {
+              admin: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  phone: true,
+                  role: true,
+                },
+              },
+            },
+          },
+        },
+        skip: Number(page - 1) * Number(limit),
+        take: Number(limit),
+        orderBy: { [keySort]: valueSort },
+      });
+      if (requests.length === 0)
+        return { message: 'There are no requests for you in this moment' };
+      const formattedRequests = formattedUserRequests(requests);
+      return formattedRequests;
+    } catch (error) {
+      console.log(error);
+
       throw new InternalServerErrorException('Internal Server Error');
     }
   }

@@ -1,4 +1,5 @@
 export enum UserRole {
+  UNREGISTERED = 'UNREGISTERED',
   NORMAL_USER = 'USER',
   ADMIN_USER = 'ADMIN',
   SUPER_USER = 'SUPERUSER',

@@ -13,6 +13,7 @@ import {
 import { sign, verify } from 'jsonwebtoken';
 import { RefreshTokenDto } from '../auth/dto/refresh-token.dto';
 import { UserRole } from './enum/user-roles.enum';
+import { FindUsersQueryDto } from './dto/find-users-query.dto';
 
 export class UserRepository {
   constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
@@ -62,7 +63,19 @@ export class UserRepository {
     return user;
   }
 
-  async getUsers() {
+  async getUsers(query: FindUsersQueryDto) {
+    let { name, email, role, page, limit, sort } = query;
+
+    name = name ? name.trim() : '';
+    email = email ? email.trim() : '';
+    role = role ? role.trim() : '';
+    sort = sort || JSON.stringify({ createdAt: 'desc' });
+    page = isNaN(page) ? 1 : page;
+    limit = isNaN(limit) || limit > 100 ? 100 : limit;
+
+    const keySort = sort ? Object.keys(JSON.parse(sort))[0] : undefined;
+    let valueSort = sort ? Object.values(JSON.parse(sort))[0] : undefined;
+    valueSort = `${valueSort}`.toLowerCase() == 'desc' ? 'desc' : 'asc';
     try {
       const query = await this.prismaClient.user.findMany({
         select: {
@@ -74,6 +87,16 @@ export class UserRepository {
           role: true,
           createdAt: true,
         },
+        where: {
+          AND: [
+            { name: { contains: name, mode: 'insensitive' } },
+            { email: { contains: email, mode: 'insensitive' } },
+            { role: { contains: role, mode: 'insensitive' } },
+          ],
+        },
+        skip: Number(page - 1) * Number(limit),
+        take: Number(limit),
+        orderBy: { [keySort]: valueSort },
       });
       const users = formattedUsers(query);
       return users;
@@ -113,11 +136,16 @@ export class UserRepository {
       select: {
         id: true,
         password: true,
+        role: true,
       },
     });
     if (!user) throw new NotFoundException('User not found');
     if (!(await this.checkPassword(password, user.password)))
       throw new UnauthorizedException('Invalid credentials');
+    if (user.role === UserRole.UNREGISTERED)
+      throw new UnauthorizedException(
+        'An administrator must approve your registration before you can log in',
+      );
     try {
       const accessToken = sign(
         { id: user.id },
@@ -162,6 +190,29 @@ export class UserRepository {
         },
       );
       return { token: accessToken };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async approveUser(userId: string) {
+    const user = await this.prismaClient.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    if (user.role != UserRole.UNREGISTERED)
+      return { message: 'User already approved' };
+
+    try {
+      await this.prismaClient.user.update({
+        where: { id: userId },
+        data: { role: UserRole.NORMAL_USER },
+      });
+      return { message: 'User approved' };
     } catch (error) {
       throw new InternalServerErrorException('Internal Server Error');
     }

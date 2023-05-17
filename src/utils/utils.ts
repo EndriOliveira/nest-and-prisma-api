@@ -76,3 +76,39 @@ export const formattedAdminCampaigns = (campaigns) => {
     })),
   }));
 };
+
+export const formattedCampaignRequests = (requests) => {
+  return requests.map((request) => ({
+    id: request.id,
+    campaign: {
+      id: request.campaign?.id,
+      title: request.campaign?.title,
+      createdAt: formatDate(request.campaign?.createdAt),
+      admin: {
+        ...request?.campaign?.admin,
+      },
+    },
+    user: {
+      ...request?.user,
+    },
+  }));
+};
+
+export const formattedUserRequests = (requests) => {
+  // TODO: FORMATAR REQUISIÇÕES
+  return requests;
+  return requests.map((request) => ({
+    id: request.id,
+    campaign: {
+      id: request.campaign?.id,
+      title: request.campaign?.title,
+      createdAt: formatDate(request.campaign?.createdAt),
+      admin: {
+        ...request?.campaign?.admin,
+      },
+    },
+    user: {
+      ...request?.user,
+    },
+  }));
+};

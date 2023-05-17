@@ -17,7 +17,12 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
     );
 
-    if (!requiredRole || userRole == UserRole.SUPER_USER) return true;
+    if (
+      !requiredRole ||
+      userRole == UserRole.SUPER_USER ||
+      (requiredRole == UserRole.NORMAL_USER && userRole == UserRole.ADMIN_USER)
+    )
+      return true;
 
     return userRole === requiredRole;
   }
