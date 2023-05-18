@@ -95,10 +95,9 @@ export const formattedCampaignRequests = (requests) => {
 };
 
 export const formattedUserRequests = (requests) => {
-  // TODO: FORMATAR REQUISIÇÕES
-  return requests;
   return requests.map((request) => ({
     id: request.id,
+    status: request.status,
     campaign: {
       id: request.campaign?.id,
       title: request.campaign?.title,
@@ -107,8 +106,21 @@ export const formattedUserRequests = (requests) => {
         ...request?.campaign?.admin,
       },
     },
-    user: {
-      ...request?.user,
-    },
+    files: request.campaign.files.map((file) => ({
+      id: file.file?.id,
+      url: resolve(__dirname, '..', '..', 'uploads', file.file?.url),
+      fileName: file.file?.url,
+    })),
   }));
+};
+
+export const generateRandomCode = (length: number) => {
+  let result = '';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 };

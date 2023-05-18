@@ -7,10 +7,12 @@ import { FileModule } from './modules/file/file.module';
 import { CampaignModule } from './modules/campaign/campaign.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './modules/auth/middleware/jwt.strategy';
+import { SendgridService } from './modules/sendgrid/sendgrid.service';
+import { SendgridModule } from './modules/sendgrid/sendgrid.module';
 
 @Module({
-  imports: [UserModule, AuthModule, FileModule, CampaignModule],
+  imports: [UserModule, AuthModule, FileModule, CampaignModule, SendgridModule],
   controllers: [AppController],
-  providers: [UserRepository, PassportModule, JwtStrategy],
+  providers: [UserRepository, PassportModule, JwtStrategy, SendgridService],
 })
 export class AppModule {}

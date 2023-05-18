@@ -1,19 +1,26 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidV4 } from 'uuid';
 import { genSalt, hash, compare } from 'bcryptjs';
-import { formatCpf, formatPhone, formattedUsers } from 'src/utils/utils';
+import { formatCpf, formatPhone, formattedUsers } from '../../utils/utils';
 import { CredentialsDto } from '../auth/dto/credentials.dto';
 import {
   NotFoundException,
   UnauthorizedException,
   ConflictException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { sign, verify } from 'jsonwebtoken';
 import { RefreshTokenDto } from '../auth/dto/refresh-token.dto';
 import { UserRole } from './enum/user-roles.enum';
 import { FindUsersQueryDto } from './dto/find-users-query.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from '../auth/dto/change-password.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
+import { ForgotPasswordDto } from '../auth/dto/forgot-password.dto';
+import * as dayjs from 'dayjs';
+import { ResetPasswordDto } from '../auth/dto/reset-password.dto';
 
 export class UserRepository {
   constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
@@ -150,16 +157,12 @@ export class UserRepository {
       const accessToken = sign(
         { id: user.id },
         process.env.ACCESS_TOKEN_SECRET,
-        {
-          expiresIn: '1h',
-        },
+        { expiresIn: '1h' },
       );
       const refreshToken = sign(
         { id: user.id },
         process.env.REFRESH_TOKEN_SECRET,
-        {
-          expiresIn: '1d',
-        },
+        { expiresIn: '1d' },
       );
       await this.prismaClient.user.update({
         where: { id: user.id },
@@ -185,9 +188,7 @@ export class UserRepository {
       const accessToken = sign(
         { id: user.id },
         process.env.ACCESS_TOKEN_SECRET,
-        {
-          expiresIn: '1h',
-        },
+        { expiresIn: '1h' },
       );
       return { token: accessToken };
     } catch (error) {
@@ -213,6 +214,117 @@ export class UserRepository {
         data: { role: UserRole.NORMAL_USER },
       });
       return { message: 'User approved' };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async updateUser(user: User, updateUserDto: UpdateUserDto) {
+    const { name, cpf, phone, password } = updateUserDto;
+    const userExists = await this.prismaClient.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!userExists) throw new NotFoundException('User not found');
+
+    if (!(await this.checkPassword(password, userExists.password)))
+      throw new UnauthorizedException('Invalid credentials');
+
+    try {
+      return await this.prismaClient.user.update({
+        where: { id: user.id },
+        data: {
+          name: name ? name : userExists.name,
+          cpf: cpf ? formatCpf(cpf) : userExists.cpf,
+          phone: phone ? formatPhone(phone) : userExists.phone,
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async changePassword(user: User, changePasswordDto: ChangePasswordDto) {
+    const { password, newPassword } = changePasswordDto;
+    const userExists = await this.prismaClient.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!userExists) throw new NotFoundException('User not found');
+    if (!(await this.checkPassword(password, userExists.password)))
+      throw new UnauthorizedException('Invalid credentials');
+
+    try {
+      return await this.prismaClient.user.update({
+        where: { id: user.id },
+        data: {
+          password: await this.hashPassword(newPassword),
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async deleteUser(user: User, deleteUserDto: DeleteUserDto) {
+    const { password } = deleteUserDto;
+    const userExists = await this.prismaClient.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!userExists) throw new NotFoundException('User not found');
+    if (!(await this.checkPassword(password, userExists.password)))
+      throw new UnauthorizedException('Invalid credentials');
+
+    try {
+      await this.prismaClient.user.delete({ where: { id: user.id } });
+      return { message: 'User deleted' };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto, code: string) {
+    const { email } = forgotPasswordDto;
+    try {
+      await this.prismaClient.user.update({
+        where: { email },
+        data: {
+          code,
+          resetPasswordExpires: dayjs(Date.now() + 3600000)
+            .subtract(3, 'hours')
+            .format(),
+        },
+      });
+      return { message: 'Email sent' };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async findUserByEmail(email: string) {
+    const user = await this.prismaClient.user.findUnique({
+      where: { email },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { code, password } = resetPasswordDto;
+    const user = await this.prismaClient.user.findFirst({
+      where: { code },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    if (dayjs().subtract(3, 'hours').isAfter(dayjs(user.resetPasswordExpires)))
+      throw new BadRequestException('Code expired');
+
+    try {
+      return await this.prismaClient.user.update({
+        where: { id: user.id },
+        data: {
+          password: await this.hashPassword(password),
+          code: null,
+          resetPasswordExpires: null,
+        },
+      });
     } catch (error) {
       throw new InternalServerErrorException('Internal Server Error');
     }

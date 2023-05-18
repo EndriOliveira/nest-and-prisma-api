@@ -12,10 +12,16 @@ import { User } from '@prisma/client';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { validateDeleteCampaignUser } from './validators/validate-delete-campaign-user';
 import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
+import { FileRepository } from '../file/file.repository';
+import { EditCampaignDto } from './dto/edit-campaign.dto';
+import { validateEditCampaign } from './validators/validate-edit-campaign';
 
 @Injectable()
 export class CampaignService {
-  constructor(private campaignRepository: CampaignRepository) {}
+  constructor(
+    private campaignRepository: CampaignRepository,
+    private fileRepository: FileRepository,
+  ) {}
 
   async getCampaigns() {
     return await this.campaignRepository.getCampaigns();
@@ -58,6 +64,10 @@ export class CampaignService {
     );
   }
 
+  async leaveCampaign(user: User, campaignId: string) {
+    return await this.campaignRepository.leaveCampaign(user, campaignId);
+  }
+
   async registerCampaignInterest(user: User, campaignId: string) {
     return await this.campaignRepository.registerCampaignInterest(
       user,
@@ -97,5 +107,29 @@ export class CampaignService {
 
   async getUserRequests(user: User, query: FindRequestsQueryDto) {
     return await this.campaignRepository.getUserRequests(user, query);
+  }
+
+  async deleteCampaign(campaignId: string) {
+    const { files } = await this.campaignRepository.deleteCampaign(campaignId);
+    files.forEach(async (file) => {
+      await this.fileRepository.deleteFile(file.fileId);
+    });
+    return { message: 'Campaign deleted successfully' };
+  }
+
+  async updateCampaign(campaignId: string, editCampaignDto: EditCampaignDto) {
+    try {
+      validateEditCampaign(editCampaignDto);
+    } catch (error) {
+      if (error['name'] === 'ZodError') {
+        throw new BadRequestException(error['issues']);
+      } else {
+        throw new InternalServerErrorException('Internal Server Error');
+      }
+    }
+    return await this.campaignRepository.updateCampaign(
+      campaignId,
+      editCampaignDto,
+    );
   }
 }

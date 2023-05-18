@@ -41,9 +41,8 @@ export class FileRepository {
   }
 
   async deleteFile(fileId: string) {
-    const query = await this.prismaClient.filesOnCampaigns.findFirst({
-      where: { fileId },
-      include: { file: true },
+    const query = await this.prismaClient.file.findFirst({
+      where: { id: fileId },
     });
 
     if (!query) throw new NotFoundException('File not found');
@@ -54,7 +53,7 @@ export class FileRepository {
       '..',
       '..',
       'uploads',
-      query.file?.url,
+      query?.url,
     );
 
     unlink(filePath, (err) => {

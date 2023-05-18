@@ -20,6 +20,7 @@ import { GetUser } from '../auth/decorator/get-user.decorator';
 import { User } from '@prisma/client';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
+import { EditCampaignDto } from './dto/edit-campaign.dto';
 
 @Controller('campaign')
 export class CampaignController {
@@ -79,11 +80,21 @@ export class CampaignController {
     );
   }
 
+  @Delete('/exit/:campaignId')
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Role(UserRole.NORMAL_USER)
+  async leaveCampaign(
+    @GetUser() user: User,
+    @Param('campaignId') campaignId: string,
+  ) {
+    return await this.campaignService.leaveCampaign(user, campaignId);
+  }
+
   @Delete('/:campaignId')
   @UseGuards(AuthGuard(), RolesGuard)
   @Role(UserRole.SUPER_USER)
-  async deleteCampaign() {
-    return { message: 'Campaign deleted' };
+  async deleteCampaign(@Param('campaignId') campaignId: string) {
+    return await this.campaignService.deleteCampaign(campaignId);
   }
 
   @Delete('/admin/user/:campaignId')
@@ -124,5 +135,18 @@ export class CampaignController {
     @Param('requestId') requestId: string,
   ) {
     return await this.campaignService.approveCampaignInterest(user, requestId);
+  }
+
+  @Put('/:campaignId')
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Role(UserRole.SUPER_USER)
+  async updateCampaign(
+    @Param('campaignId') campaignId: string,
+    @Body() editCampaignDto: EditCampaignDto,
+  ) {
+    return await this.campaignService.updateCampaign(
+      campaignId,
+      editCampaignDto,
+    );
   }
 }

@@ -18,6 +18,7 @@ import {
 } from 'src/utils/utils';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
+import { EditCampaignDto } from './dto/edit-campaign.dto';
 
 export class CampaignRepository {
   constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
@@ -170,6 +171,12 @@ export class CampaignRepository {
         where: { AND: [{ campaignId }, { userId: user.id }] },
       });
 
+    const campaignExists = await this.prismaClient.campaign.findUnique({
+      where: { id: campaignId },
+    });
+
+    if (!campaignExists) throw new NotFoundException('Campaign does not exist');
+
     if (interestAlreadyExists)
       throw new ConflictException('Already registered');
 
@@ -185,6 +192,8 @@ export class CampaignRepository {
         message: 'User successfully registered on campaign',
       };
     } catch (error) {
+      console.log(error);
+
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
@@ -328,6 +337,16 @@ export class CampaignRepository {
                   role: true,
                 },
               },
+              files: {
+                include: {
+                  file: {
+                    select: {
+                      id: true,
+                      url: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -340,8 +359,66 @@ export class CampaignRepository {
       const formattedRequests = formattedUserRequests(requests);
       return formattedRequests;
     } catch (error) {
-      console.log(error);
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
 
+  async leaveCampaign(user: User, campaignId: string) {
+    const campaignRegister = await this.prismaClient.usersOnCampaigns.findFirst(
+      {
+        where: { AND: [{ campaignId }, { userId: user.id }] },
+      },
+    );
+
+    if (!campaignRegister)
+      throw new NotFoundException('User is not registered on this campaign');
+
+    try {
+      await this.prismaClient.usersOnCampaigns.delete({
+        where: { id: campaignRegister.id },
+      });
+      return { message: 'User successfully deleted from campaign' };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async deleteCampaign(campaignId: string) {
+    const campaign = await this.prismaClient.campaign.findUnique({
+      where: { id: campaignId },
+    });
+    if (!campaign) throw new NotFoundException('Campaign does not exist');
+
+    const files = await this.prismaClient.filesOnCampaigns.findMany({
+      where: { campaignId },
+    });
+
+    try {
+      await this.prismaClient.campaign.delete({
+        where: { id: campaignId },
+      });
+      if (files.length > 0) return { files };
+      return { message: 'Campaign deleted successfully' };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async updateCampaign(campaignId: string, editCampaignDto: EditCampaignDto) {
+    const { title } = editCampaignDto;
+    const campaign = await this.prismaClient.campaign.findUnique({
+      where: { id: campaignId },
+    });
+    if (!campaign) throw new NotFoundException('Campaign does not exist');
+
+    try {
+      return await this.prismaClient.campaign.update({
+        where: { id: campaignId },
+        data: {
+          title: title.trim().length > 0 ? title : campaign.title,
+        },
+      });
+    } catch (error) {
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
