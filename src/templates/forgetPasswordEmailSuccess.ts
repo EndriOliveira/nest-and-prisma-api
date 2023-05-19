@@ -1,10 +1,10 @@
-export type TypeTemplateForgetPasswordSucess = {
+export type TypeTemplateForgetPasswordSuccess = {
   email: string;
   name: string;
 };
 
-export const templateForgetPasswordSucess = async (
-  forgetPasswordBody: TypeTemplateForgetPasswordSucess,
+export const templateForgetPasswordSuccess = async (
+  forgetPasswordBody: TypeTemplateForgetPasswordSuccess,
 ) => {
   const mail = {
     to: forgetPasswordBody.email,

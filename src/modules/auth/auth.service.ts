@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { validateCreateUser } from './validators/validate-create-user';
-import { validateCPF } from 'src/utils/validate-cpf';
+import { validateCPF } from '../../utils/validate-cpf';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserRepository } from '../user/user.repository';
 import { CredentialsDto } from './dto/credentials.dto';
@@ -17,12 +17,12 @@ import { User } from '@prisma/client';
 import { validateChangePassword } from './validators/validate-change-password';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { validateForgotPassword } from './validators/validate-forgot-password';
-import { templateForgetPassword } from 'src/templates/forgetPasswordEmail';
-import { generateRandomCode } from 'src/utils/utils';
+import { templateForgetPassword } from '../../templates/forgetPasswordEmail';
+import { generateRandomCode } from '../../utils/utils';
 import { SendgridService } from '../sendgrid/sendgrid.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { validateResetPassword } from './validators/validate-reset-password';
-import { templateForgetPasswordSucess } from 'src/templates/forgetPasswordEmailSuccess';
+import { templateForgetPasswordSuccess } from '../../templates/forgetPasswordEmailSuccess';
 
 @Injectable()
 export class AuthService {
@@ -127,7 +127,7 @@ export class AuthService {
     const { email, name } = await this.userRepository.resetPassword(
       resetPasswordDto,
     );
-    const mail = await templateForgetPasswordSucess({ email, name });
+    const mail = await templateForgetPasswordSuccess({ email, name });
     await this.sendGridService.sendMail(mail);
     return { message: 'Password changed successfully' };
   }

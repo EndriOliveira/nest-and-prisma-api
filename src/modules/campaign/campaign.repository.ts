@@ -15,7 +15,7 @@ import {
   formattedCampaignRequests,
   formattedCampaigns,
   formattedUserRequests,
-} from 'src/utils/utils';
+} from '../../utils/utils';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 import { EditCampaignDto } from './dto/edit-campaign.dto';
@@ -192,8 +192,6 @@ export class CampaignRepository {
         message: 'User successfully registered on campaign',
       };
     } catch (error) {
-      console.log(error);
-
       throw new InternalServerErrorException('Internal Server Error');
     }
   }

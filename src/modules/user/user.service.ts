@@ -8,7 +8,7 @@ import { FindUsersQueryDto } from './dto/find-users-query.dto';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { validateUpdateUser } from './validators/validate-update-user';
-import { validateCPF } from 'src/utils/validate-cpf';
+import { validateCPF } from '../../utils/validate-cpf';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { validateDeleteUser } from './validators/validate-delete-user';
 

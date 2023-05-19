@@ -11,7 +11,14 @@ import { SendgridService } from './modules/sendgrid/sendgrid.service';
 import { SendgridModule } from './modules/sendgrid/sendgrid.module';
 
 @Module({
-  imports: [UserModule, AuthModule, FileModule, CampaignModule, SendgridModule],
+  imports: [
+    UserModule,
+    AuthModule,
+    FileModule,
+    CampaignModule,
+    SendgridModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+  ],
   controllers: [AppController],
   providers: [UserRepository, PassportModule, JwtStrategy, SendgridService],
 })
