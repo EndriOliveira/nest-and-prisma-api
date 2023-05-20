@@ -23,9 +23,9 @@ import * as dayjs from 'dayjs';
 import { ResetPasswordDto } from '../auth/dto/reset-password.dto';
 
 export class UserRepository {
-  constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
+  constructor(public prismaClient: PrismaClient = new PrismaClient()) {}
 
-  private async hashPassword(password: string): Promise<string> {
+  async hashPassword(password: string): Promise<string> {
     try {
       const salt = await genSalt(10);
       return await hash(password, salt);
@@ -34,7 +34,7 @@ export class UserRepository {
     }
   }
 
-  private async checkPassword(
+  async checkPassword(
     password: string,
     userPassword: string,
   ): Promise<boolean> {
@@ -45,7 +45,7 @@ export class UserRepository {
     }
   }
 
-  private validateRefreshToken(refreshToken: string) {
+  validateRefreshToken(refreshToken: string) {
     try {
       return verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
     } catch (error) {
