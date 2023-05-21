@@ -21,11 +21,12 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { ForgotPasswordDto } from '../auth/dto/forgot-password.dto';
 import * as dayjs from 'dayjs';
 import { ResetPasswordDto } from '../auth/dto/reset-password.dto';
+import { IUserRepository } from './Iuser.repository';
 
-export class UserRepository {
-  constructor(public prismaClient: PrismaClient = new PrismaClient()) {}
+export class UserRepository implements IUserRepository {
+  constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
 
-  async hashPassword(password: string): Promise<string> {
+  private async hashPassword(password: string): Promise<string> {
     try {
       const salt = await genSalt(10);
       return await hash(password, salt);
@@ -34,7 +35,7 @@ export class UserRepository {
     }
   }
 
-  async checkPassword(
+  private async checkPassword(
     password: string,
     userPassword: string,
   ): Promise<boolean> {
@@ -45,7 +46,7 @@ export class UserRepository {
     }
   }
 
-  validateRefreshToken(refreshToken: string) {
+  private validateRefreshToken(refreshToken: string) {
     try {
       return verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
     } catch (error) {
@@ -54,7 +55,7 @@ export class UserRepository {
   }
 
   async getUserById(id: string) {
-    const user = await this.prismaClient.user.findUnique({
+    const user = (await this.prismaClient.user.findUnique({
       where: { id },
       select: {
         id: true,
@@ -65,7 +66,7 @@ export class UserRepository {
         role: true,
         createdAt: true,
       },
-    });
+    })) as User;
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
@@ -293,7 +294,7 @@ export class UserRepository {
             .format(),
         },
       });
-      return { message: 'Email sent' };
+      return { message: 'Code generated successfully' };
     } catch (error) {
       throw new InternalServerErrorException('Internal Server Error');
     }

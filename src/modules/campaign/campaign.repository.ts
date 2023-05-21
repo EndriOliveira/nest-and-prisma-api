@@ -19,8 +19,9 @@ import {
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 import { EditCampaignDto } from './dto/edit-campaign.dto';
+import { ICampaignRepository } from './Icampaign.repository';
 
-export class CampaignRepository {
+export class CampaignRepository implements ICampaignRepository {
   constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
 
   async getCampaigns() {
