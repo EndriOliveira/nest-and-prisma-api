@@ -156,7 +156,7 @@ export class InMemoryUserRepository implements IUserRepository {
     credentialsDto: CredentialsDto,
   ): Promise<{ token: string; refreshToken: string }> {
     const { email, password } = credentialsDto;
-    let user = this.users.find((user) => user.email === email);
+    const user = this.users.find((user) => user.email === email);
     if (!user) throw new NotFoundException('User not found');
     if (!(await this.checkPassword(password, user.password)))
       throw new UnauthorizedException('Invalid credentials');
@@ -177,18 +177,14 @@ export class InMemoryUserRepository implements IUserRepository {
       'UJ66kR4e0tFtZhSWEKVxA53MAZUk4Qtg59s3APwQkbSklIJFiT',
       { expiresIn: '1d' },
     );
-    user = {
-      ...user,
-      refreshToken,
-    };
+    this.users = this.users.filter((user) => user.email !== email);
+    this.users.push({ ...user, refreshToken });
     return Promise.resolve({ token: accessToken, refreshToken });
   }
 
   async refreshToken({
     refreshToken,
   }: RefreshTokenDto): Promise<{ token: string }> {
-    console.log(this.users);
-
     this.validateRefreshToken(refreshToken);
     const user = this.users.find((user) => user.refreshToken === refreshToken);
     if (!user) throw new NotFoundException('User not found');

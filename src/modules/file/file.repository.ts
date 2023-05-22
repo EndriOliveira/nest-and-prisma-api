@@ -6,8 +6,9 @@ import { PrismaClient } from '@prisma/client';
 import { v4 as uuidV4 } from 'uuid';
 import { unlink } from 'fs';
 import { resolve } from 'path';
+import { IFileRepository } from './Ifile.repository';
 
-export class FileRepository {
+export class FileRepository implements IFileRepository {
   constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
 
   async uploadFile(files, campaignId: string) {

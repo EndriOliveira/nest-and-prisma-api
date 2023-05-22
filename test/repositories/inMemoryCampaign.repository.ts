@@ -1,22 +1,18 @@
 import {
-  ConflictException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import {
   Campaign,
   User,
   FilesOnCampaigns,
   UsersOnCampaigns,
 } from '@prisma/client';
 import { v4 as uuidV4 } from 'uuid';
-import { ICampaignRepository } from 'src/modules/campaign/Icampaign.repository';
-import { CreateCampaignDto } from 'src/modules/campaign/dto/create-campaign.dto';
-import { DeleteCampaignUserDto } from 'src/modules/campaign/dto/delete-campaign-user.dto';
-import { EditCampaignDto } from 'src/modules/campaign/dto/edit-campaign.dto';
-import { FindRequestsQueryDto } from 'src/modules/campaign/dto/find-requests-query.dto';
-import { RegisterAdminDto } from 'src/modules/campaign/dto/register-admin.dto';
-import { UserRole } from 'src/modules/user/enum/user-roles.enum';
+import { ICampaignRepository } from '../../src/modules/campaign/Icampaign.repository';
+import { CreateCampaignDto } from '../../src/modules/campaign/dto/create-campaign.dto';
+import { DeleteCampaignUserDto } from '../../src/modules/campaign/dto/delete-campaign-user.dto';
+import { EditCampaignDto } from '../../src/modules/campaign/dto/edit-campaign.dto';
+import { FindRequestsQueryDto } from '../../src/modules/campaign/dto/find-requests-query.dto';
+import { RegisterAdminDto } from '../../src/modules/campaign/dto/register-admin.dto';
+import { UserRole } from '../../src/modules/user/enum/user-roles.enum';
+import { ApproveRequestDto } from 'src/modules/campaign/dto/approve-request.dto';
 
 export class InMemoryCampaignRepository implements ICampaignRepository {
   private campaigns: Campaign[] = [];
@@ -37,9 +33,6 @@ export class InMemoryCampaignRepository implements ICampaignRepository {
     const campaign = this.campaigns.find(
       (campaign) => campaign.id === campaignId,
     );
-    if (!campaign) throw new Error('Campaign not found');
-    if (campaign.adminId !== user.id && user.role !== UserRole.SUPER_USER)
-      throw new UnauthorizedException('User is not the admin of this campaign');
     return Promise.resolve(campaign);
   }
 
@@ -85,10 +78,8 @@ export class InMemoryCampaignRepository implements ICampaignRepository {
       (campaign) => campaign.id === campaignId,
     );
 
-    if (!campaignExists) throw new NotFoundException('Campaign does not exist');
-
-    if (interestAlreadyExists)
-      throw new ConflictException('Already registered');
+    if (!campaignExists) return { message: 'Campaign does not exist' };
+    if (interestAlreadyExists) return { message: 'Already registered' };
 
     this.usersOnCampaigns.push({
       id: uuidV4(),
@@ -113,8 +104,7 @@ export class InMemoryCampaignRepository implements ICampaignRepository {
         campaign.id === campaignId &&
         campaign.userId === deleteCampaignUserDto.userId,
     );
-    if (!query)
-      throw new NotFoundException('User is not registered on this campaign');
+    if (!query) return { message: 'User is not registered on this campaign' };
 
     this.usersOnCampaigns = this.usersOnCampaigns.filter(
       (interest) => interest.id !== query.id,
@@ -137,7 +127,9 @@ export class InMemoryCampaignRepository implements ICampaignRepository {
   async approveCampaignInterest(
     user: User,
     requestId: string,
+    approveRequestDto: ApproveRequestDto,
   ): Promise<{ message: string }> {
+    const { status } = approveRequestDto;
     const interest = this.usersOnCampaigns.find(
       (interest) => interest.id === requestId,
     );
@@ -146,14 +138,24 @@ export class InMemoryCampaignRepository implements ICampaignRepository {
     );
 
     if (user.role !== UserRole.SUPER_USER && campaign.adminId !== user.id)
-      throw new UnauthorizedException('User is not the admin of this campaign');
-    if (!interest) throw new NotFoundException('Request not found');
+      return { message: 'User is not the admin of this campaign' };
+    if (!interest) return { message: 'Request not found' };
 
     if (interest.status) return { message: 'Request already approved' };
-    interest.status = true;
-    return {
-      message: 'User successfully approved on campaign',
-    };
+
+    if (status) {
+      interest.status = true;
+      return {
+        message: 'User successfully approved on campaign',
+      };
+    } else {
+      this.usersOnCampaigns = this.usersOnCampaigns.filter(
+        (interest) => interest.id !== requestId,
+      );
+      return {
+        message: 'User successfully rejected on campaign',
+      };
+    }
   }
 
   async getUserRequests(user: User, query: FindRequestsQueryDto): Promise<any> {
@@ -172,7 +174,7 @@ export class InMemoryCampaignRepository implements ICampaignRepository {
         campaign.userId === user.id && campaign.campaignId === campaignId,
     );
     if (!campaign)
-      throw new NotFoundException('User is not registered on this campaign');
+      return { message: 'User is not registered on this campaign' };
 
     this.usersOnCampaigns = this.usersOnCampaigns.filter(
       (campaign) => campaign.id !== campaign.id,

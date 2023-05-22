@@ -59,8 +59,8 @@ describe('AuthService', () => {
     expect(response).toHaveProperty('id');
   });
 
-  it('should create user', async () => {
-    const response = await authService.createUser(
+  it('should forget password', async () => {
+    const user = await authService.createUser(
       {
         name: 'Test User Secondary',
         email: 'user.test03@example.com',
@@ -71,6 +71,26 @@ describe('AuthService', () => {
       },
       UserRole.UNREGISTERED,
     );
-    expect(response).toHaveProperty('id');
+    const response = await authService.forgotPassword({ email: user.email });
+    expect(response).toStrictEqual({ message: 'Email sent successfully' });
+  });
+
+  it('should refresh token', async () => {
+    const user = {
+      name: 'Test User Fourth',
+      email: 'user.test04@example.com',
+      cpf: '25494611000',
+      password: 'password!Teste15',
+      confirmPassword: 'password!Teste15',
+      phone: '(11) 91451-9163',
+    };
+
+    await authService.createUser(user, UserRole.NORMAL_USER);
+    const { refreshToken } = await authService.signIn({
+      email: user.email,
+      password: user.password,
+    });
+    const response = await authService.refreshToken({ refreshToken });
+    expect(response).toHaveProperty('token');
   });
 });

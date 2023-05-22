@@ -4,6 +4,7 @@ import { RegisterAdminDto } from './dto/register-admin.dto';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 import { EditCampaignDto } from './dto/edit-campaign.dto';
+import { ApproveRequestDto } from './dto/approve-request.dto';
 
 export interface ICampaignRepository {
   getCampaigns(): Promise<Campaign[]>;
@@ -26,6 +27,7 @@ export interface ICampaignRepository {
   approveCampaignInterest(
     user: User,
     requestId: string,
+    approveRequestDto: ApproveRequestDto,
   ): Promise<{ message: string }>;
   getUserRequests(user: User, query: FindRequestsQueryDto): Promise<any>;
   leaveCampaign(user: User, campaignId: string): Promise<{ message: string }>;

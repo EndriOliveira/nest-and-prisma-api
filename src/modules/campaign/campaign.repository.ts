@@ -20,6 +20,7 @@ import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 import { EditCampaignDto } from './dto/edit-campaign.dto';
 import { ICampaignRepository } from './Icampaign.repository';
+import { ApproveRequestDto } from './dto/approve-request.dto';
 
 export class CampaignRepository implements ICampaignRepository {
   constructor(private prismaClient: PrismaClient = new PrismaClient()) {}
@@ -259,7 +260,12 @@ export class CampaignRepository implements ICampaignRepository {
     }
   }
 
-  async approveCampaignInterest(user: User, requestId: string) {
+  async approveCampaignInterest(
+    user: User,
+    requestId: string,
+    approveRequestDto: ApproveRequestDto,
+  ) {
+    const { status } = approveRequestDto;
     const request = await this.prismaClient.usersOnCampaigns.findFirst({
       where: { id: requestId },
       include: {
@@ -290,15 +296,24 @@ export class CampaignRepository implements ICampaignRepository {
     if (request.status) return { message: 'Request already approved' };
 
     try {
-      await this.prismaClient.usersOnCampaigns.update({
-        where: { id: requestId },
-        data: {
-          status: true,
-        },
-      });
-      return {
-        message: 'User successfully approved on campaign',
-      };
+      if (status) {
+        await this.prismaClient.usersOnCampaigns.update({
+          where: { id: requestId },
+          data: {
+            status,
+          },
+        });
+        return {
+          message: 'User successfully approved on campaign',
+        };
+      } else {
+        await this.prismaClient.usersOnCampaigns.delete({
+          where: { id: requestId },
+        });
+        return {
+          message: 'User successfully rejected from campaign',
+        };
+      }
     } catch (error) {
       throw new InternalServerErrorException('Internal Server Error');
     }

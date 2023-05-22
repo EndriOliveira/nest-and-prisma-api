@@ -21,6 +21,7 @@ import { User } from '@prisma/client';
 import { DeleteCampaignUserDto } from './dto/delete-campaign-user.dto';
 import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 import { EditCampaignDto } from './dto/edit-campaign.dto';
+import { ApproveRequestDto } from './dto/approve-request.dto';
 
 @Controller('campaign')
 export class CampaignController {
@@ -133,8 +134,13 @@ export class CampaignController {
   async approveCampaignInterest(
     @GetUser() user: User,
     @Param('requestId') requestId: string,
+    @Body() approveRequestDto: ApproveRequestDto,
   ) {
-    return await this.campaignService.approveCampaignInterest(user, requestId);
+    return await this.campaignService.approveCampaignInterest(
+      user,
+      requestId,
+      approveRequestDto,
+    );
   }
 
   @Put('/:campaignId')

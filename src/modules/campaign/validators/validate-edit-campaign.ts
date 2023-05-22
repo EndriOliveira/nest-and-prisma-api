@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { EditCampaignDto } from '../dto/edit-campaign.dto';
 
-export const validateEditCampaign = (body: EditCampaignDto): void => {
+export const validateEditCampaign = (body: EditCampaignDto) => {
   const Campaign = z.object({
     title: z.string().trim(),
   });
-  Campaign.parse(body);
+  return Campaign.safeParse(body);
 };
