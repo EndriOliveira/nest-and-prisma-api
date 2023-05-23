@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 
-export const validateResetPassword = (body: ResetPasswordDto): void => {
+export const validateResetPassword = (body: ResetPasswordDto) => {
   const User = z.object({
     code: z.string().trim().max(255),
     password: z
@@ -15,5 +15,5 @@ export const validateResetPassword = (body: ResetPasswordDto): void => {
       .max(255),
     confirmPassword: z.string().trim().max(255),
   });
-  User.parse(body);
+  return User.safeParse(body);
 };

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 
-export const validateChangePassword = (body: ChangePasswordDto): void => {
+export const validateChangePassword = (body: ChangePasswordDto) => {
   const User = z.object({
     password: z.string().trim().max(255),
     newPassword: z
@@ -15,5 +15,5 @@ export const validateChangePassword = (body: ChangePasswordDto): void => {
       .max(255),
     confirmNewPassword: z.string().trim().max(255),
   });
-  User.parse(body);
+  return User.safeParse(body);
 };

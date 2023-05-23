@@ -15,6 +15,8 @@ import { FindRequestsQueryDto } from './dto/find-requests-query.dto';
 import { FileRepository } from '../file/file.repository';
 import { EditCampaignDto } from './dto/edit-campaign.dto';
 import { validateEditCampaign } from './validators/validate-edit-campaign';
+import { ApproveRequestDto } from './dto/approve-request.dto';
+import { validateApproveInterest } from './validators/validate-approve-campaign';
 
 @Injectable()
 export class CampaignService {
@@ -98,10 +100,24 @@ export class CampaignService {
     return await this.campaignRepository.getCampaignsRequests(user);
   }
 
-  async approveCampaignInterest(user: User, requestId: string) {
+  async approveCampaignInterest(
+    user: User,
+    requestId: string,
+    approveRequestDto: ApproveRequestDto,
+  ) {
+    try {
+      validateApproveInterest(approveRequestDto);
+    } catch (error) {
+      if (error['name'] === 'ZodError') {
+        throw new BadRequestException(error['issues']);
+      } else {
+        throw new InternalServerErrorException('Internal Server Error');
+      }
+    }
     return await this.campaignRepository.approveCampaignInterest(
       user,
       requestId,
+      approveRequestDto,
     );
   }
 
@@ -111,6 +127,7 @@ export class CampaignService {
 
   async deleteCampaign(campaignId: string) {
     const { files } = await this.campaignRepository.deleteCampaign(campaignId);
+    if (!files) return { message: 'Campaign deleted successfully' };
     files.forEach(async (file) => {
       await this.fileRepository.deleteFile(file.fileId);
     });

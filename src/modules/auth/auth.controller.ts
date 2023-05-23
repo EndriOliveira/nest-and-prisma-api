@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -12,12 +13,15 @@ import { UserRole } from '../user/enum/user-roles.enum';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { formatDate } from '../../utils/utils';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/signup')
+  @ApiBody({ type: CreateUserDto })
   async signUp(@Body() createUserDto: CreateUserDto) {
     return await this.authService.createUser(
       createUserDto,
@@ -26,6 +30,7 @@ export class AuthController {
   }
 
   @Post('/signin')
+  @ApiBody({ type: CredentialsDto })
   async signIn(@Body() credentialsBody: CredentialsDto) {
     return await this.authService.signIn(credentialsBody);
   }
@@ -33,6 +38,8 @@ export class AuthController {
   @Post('/create-admin')
   @UseGuards(AuthGuard(), RolesGuard)
   @Role(UserRole.SUPER_USER)
+  @ApiBody({ type: CreateUserDto })
+  @ApiBearerAuth()
   async createAdmin(@Body() createAdminDto: CreateUserDto) {
     return await this.authService.createUser(
       createAdminDto,
@@ -41,18 +48,25 @@ export class AuthController {
   }
 
   @Post('/refresh')
+  @ApiBody({ type: RefreshTokenDto })
   async refreshToken(@Body() refreshToken: RefreshTokenDto) {
     return await this.authService.refreshToken(refreshToken);
   }
 
   @Get('/me')
   @UseGuards(AuthGuard())
+  @ApiBearerAuth()
   async getMe(@GetUser() user: User) {
-    return user;
+    return {
+      ...user,
+      createdAt: formatDate(user.createdAt),
+    };
   }
 
   @Put('/change-password')
   @UseGuards(AuthGuard())
+  @ApiBody({ type: ChangePasswordDto })
+  @ApiBearerAuth()
   async changePassword(
     @GetUser() user: User,
     @Body() changePasswordDto: ChangePasswordDto,
@@ -61,11 +75,13 @@ export class AuthController {
   }
 
   @Post('/forgot-password')
+  @ApiBody({ type: ForgotPasswordDto })
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return await this.authService.forgotPassword(forgotPasswordDto);
   }
 
   @Post('/reset-password')
+  @ApiBody({ type: ResetPasswordDto })
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return await this.authService.resetPassword(resetPasswordDto);
   }

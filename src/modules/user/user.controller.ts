@@ -11,6 +11,7 @@ import {
 import { UserService } from './user.service';
 import { FindUsersQueryDto } from './dto/find-users-query.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBody, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/guard/roles.guard';
 import { UserRole } from './enum/user-roles.enum';
 import { Role } from '../auth/decorator/role.decorator';
@@ -20,23 +21,31 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 
 @Controller('users')
+@ApiTags('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Get('/')
+  @Get('/admin')
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Role(UserRole.ADMIN_USER)
+  @ApiBearerAuth()
+  @ApiBody({ type: FindUsersQueryDto })
   async getUsers(@Query() query: FindUsersQueryDto) {
     return await this.userService.getUsers(query);
   }
 
-  @Put('/approve/:id')
+  @Put('/admin/approve/:userId')
   @UseGuards(AuthGuard(), RolesGuard)
   @Role(UserRole.ADMIN_USER)
-  async approveUser(@Param('id') id: string) {
+  @ApiBearerAuth()
+  async approveUser(@Param('userId') id: string) {
     return await this.userService.approveUser(id);
   }
 
   @Put('/update')
   @UseGuards(AuthGuard())
+  @ApiBody({ type: UpdateUserDto })
+  @ApiBearerAuth()
   async updateUser(
     @GetUser() user: User,
     @Body() updateUserDto: UpdateUserDto,
@@ -47,6 +56,8 @@ export class UserController {
   @Delete('/')
   @UseGuards(AuthGuard(), RolesGuard)
   @Role(UserRole.NORMAL_USER)
+  @ApiBody({ type: DeleteUserDto })
+  @ApiBearerAuth()
   async deleteUser(
     @GetUser() user: User,
     @Body() deleteUserDto: DeleteUserDto,
