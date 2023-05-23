@@ -9,7 +9,7 @@ import { ApproveRequestDto } from './dto/approve-request.dto';
 export interface ICampaignRepository {
   getCampaigns(): Promise<Campaign[]>;
   getCampaignDetails(user: User, campaignId: string): Promise<any>;
-  getAdminCampaigns(user: User): Promise<Campaign[]>;
+  getAdminCampaigns(user: User): Promise<Campaign[] | { message: string }>;
   createCampaign(createCampaignDto: CreateCampaignDto): Promise<Campaign>;
   registerAdmin(
     campaignId: string,

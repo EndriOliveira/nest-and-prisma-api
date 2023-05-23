@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 
-export const validateCreateUser = (body: CreateUserDto): void => {
+export const validateCreateUser = (body: CreateUserDto) => {
   const User = z.object({
     name: z.string().trim().min(2).max(255),
     cpf: z
@@ -25,5 +25,5 @@ export const validateCreateUser = (body: CreateUserDto): void => {
       .max(255),
     confirmPassword: z.string().trim().max(255),
   });
-  User.parse(body);
+  return User.safeParse(body);
 };

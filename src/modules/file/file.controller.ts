@@ -7,11 +7,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileService } from './file.service';
+import { ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
 
 @Controller('file')
+@ApiTags('file')
 export class FileController {
   constructor(private fileService: FileService) {}
 
@@ -30,6 +32,18 @@ export class FileController {
       }),
     }),
   )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async uploadFile(
     @UploadedFiles() files,
     @Param('campaignId') campaignId: string,

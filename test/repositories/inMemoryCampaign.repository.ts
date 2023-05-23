@@ -36,7 +36,9 @@ export class InMemoryCampaignRepository implements ICampaignRepository {
     return Promise.resolve(campaign);
   }
 
-  async getAdminCampaigns(user: User): Promise<Campaign[]> {
+  async getAdminCampaigns(
+    user: User,
+  ): Promise<Campaign[] | { message: string }> {
     return Promise.resolve(
       this.campaigns.filter((campaign) => campaign.adminId === user.id),
     );

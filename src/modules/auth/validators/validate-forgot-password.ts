@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 
-export const validateForgotPassword = (body: ForgotPasswordDto): void => {
+export const validateForgotPassword = (body: ForgotPasswordDto) => {
   const User = z.object({
     email: z.string().trim().email(),
   });
-  User.parse(body);
+  return User.safeParse(body);
 };

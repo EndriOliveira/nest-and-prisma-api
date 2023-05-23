@@ -1,3 +1,4 @@
+import { Campaign, User, UsersOnCampaigns } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { resolve } from 'path';
 
@@ -9,15 +10,15 @@ export const formatHours = (date: Date) => {
   return dayjs(date).subtract(3, 'hours').format('HH:mm');
 };
 
-export const formatCpf = (cpf) => {
+export const formatCpf = (cpf: string): string => {
   return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 };
 
-export const formatPhone = (phone) => {
+export const formatPhone = (phone: string): string => {
   return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
 };
 
-export const formattedUsers = (users) => {
+export const formattedUsers = (users): User[] => {
   return users.map((user) => ({
     id: user?.id,
     name: user?.name,
@@ -29,7 +30,7 @@ export const formattedUsers = (users) => {
   }));
 };
 
-export const formattedCampaigns = (campaigns) => {
+export const formattedCampaigns = (campaigns): Campaign[] => {
   return campaigns.map((campaign) => ({
     id: campaign.id,
     title: campaign.title,
@@ -39,7 +40,7 @@ export const formattedCampaigns = (campaigns) => {
     },
     files: campaign.files.map((file) => ({
       id: file.file?.id,
-      url: resolve(__dirname, '..', '..', 'uploads', file.file?.url),
+      url: resolve(__dirname, '..', '..', '..', 'uploads', file.file?.url),
       fileName: file.file?.url,
     })),
   }));
@@ -55,13 +56,17 @@ export const formattedCampaign = (campaign) => {
     },
     files: campaign.files.map((file) => ({
       id: file.file?.id,
-      url: resolve(__dirname, '..', '..', 'uploads', file.file?.url),
+      url: resolve(__dirname, '..', '..', '..', 'uploads', file.file?.url),
       fileName: file.file?.url,
+    })),
+    users: campaign.users.map((user) => ({
+      ...user?.user,
+      status: user?.status,
     })),
   };
 };
 
-export const formattedAdminCampaigns = (campaigns) => {
+export const formattedAdminCampaigns = (campaigns): Campaign[] => {
   return campaigns.map((campaign) => ({
     id: campaign.id,
     title: campaign.title,
@@ -71,13 +76,13 @@ export const formattedAdminCampaigns = (campaigns) => {
     })),
     files: campaign.files.map((file) => ({
       id: file.file?.id,
-      url: resolve(__dirname, '..', '..', 'uploads', file.file?.url),
+      url: resolve(__dirname, '..', '..', '..', 'uploads', file.file?.url),
       fileName: file.file?.url,
     })),
   }));
 };
 
-export const formattedCampaignRequests = (requests) => {
+export const formattedCampaignRequests = (requests): UsersOnCampaigns[] => {
   return requests.map((request) => ({
     id: request.id,
     campaign: {
@@ -108,13 +113,13 @@ export const formattedUserRequests = (requests) => {
     },
     files: request.campaign.files.map((file) => ({
       id: file.file?.id,
-      url: resolve(__dirname, '..', '..', 'uploads', file.file?.url),
+      url: resolve(__dirname, '..', '..', '..', 'uploads', file.file?.url),
       fileName: file.file?.url,
     })),
   }));
 };
 
-export const generateRandomCode = (length: number) => {
+export const generateRandomCode = (length: number): string => {
   let result = '';
   const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
