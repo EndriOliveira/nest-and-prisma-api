@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { RegisterAdminDto } from '../dto/register-admin.dto';
 
-export const validateRegisterAdmin = (body: RegisterAdminDto): void => {
+export const validateRegisterAdmin = (body: RegisterAdminDto) => {
   const CampaignAdmin = z.object({
     adminId: z.string().trim(),
   });
-  CampaignAdmin.parse(body);
+  return CampaignAdmin.safeParse(body);
 };
