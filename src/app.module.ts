@@ -11,7 +11,7 @@ import { SendgridService } from './modules/sendgrid/sendgrid.service';
 import { SendgridModule } from './modules/sendgrid/sendgrid.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerInterceptor } from './interceptor/logger.interceptor';
-import { winstonConfig } from './configs/wiston.config';
+import { winstonConfig } from './configs/winston.config';
 import { WinstonModule } from 'nest-winston';
 
 @Module({
