@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CampaignRepository } from './campaign.repository';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { validateCreateCampaign } from './validators/validate-create-campaign';
@@ -38,28 +34,16 @@ export class CampaignService {
   }
 
   async createCampaign(createCampaignDto: CreateCampaignDto) {
-    try {
-      validateCreateCampaign(createCampaignDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateCreateCampaign(createCampaignDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     return await this.campaignRepository.createCampaign(createCampaignDto);
   }
 
   async registerAdmin(campaignId: string, registerAdminDto: RegisterAdminDto) {
-    try {
-      validateRegisterAdmin(registerAdminDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateRegisterAdmin(registerAdminDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     return await this.campaignRepository.registerAdmin(
       campaignId,
       registerAdminDto,
@@ -81,15 +65,9 @@ export class CampaignService {
     deleteCampaignUserDto: DeleteCampaignUserDto,
     campaignId: string,
   ) {
-    try {
-      validateDeleteCampaignUser(deleteCampaignUserDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateDeleteCampaignUser(deleteCampaignUserDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     return await this.campaignRepository.deleteCampaignUser(
       deleteCampaignUserDto,
       campaignId,
@@ -105,15 +83,9 @@ export class CampaignService {
     requestId: string,
     approveRequestDto: ApproveRequestDto,
   ) {
-    try {
-      validateApproveInterest(approveRequestDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateApproveInterest(approveRequestDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     return await this.campaignRepository.approveCampaignInterest(
       user,
       requestId,
@@ -135,15 +107,9 @@ export class CampaignService {
   }
 
   async updateCampaign(campaignId: string, editCampaignDto: EditCampaignDto) {
-    try {
-      validateEditCampaign(editCampaignDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateEditCampaign(editCampaignDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     return await this.campaignRepository.updateCampaign(
       campaignId,
       editCampaignDto,

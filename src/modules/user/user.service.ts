@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { FindUsersQueryDto } from './dto/find-users-query.dto';
 import { User } from '@prisma/client';
@@ -25,29 +21,17 @@ export class UserService {
   }
 
   async updateUser(user: User, updateUserDto: UpdateUserDto) {
-    try {
-      validateUpdateUser(updateUserDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateUpdateUser(updateUserDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     if (updateUserDto.cpf) validateCPF(updateUserDto.cpf);
     return await this.userRepository.updateUser(user, updateUserDto);
   }
 
   async deleteUser(user: User, deleteUserDto: DeleteUserDto) {
-    try {
-      validateDeleteUser(deleteUserDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateDeleteUser(deleteUserDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     return await this.userRepository.deleteUser(user, deleteUserDto);
   }
 }

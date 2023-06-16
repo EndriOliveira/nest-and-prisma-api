@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { validateCreateUser } from './validators/validate-create-user';
 import { validateCPF } from '../../utils/validate-cpf';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -32,15 +28,9 @@ export class AuthService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto, role: UserRole) {
-    try {
-      validateCreateUser(createUserDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateCreateUser(createUserDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     const { password, confirmPassword } = createUserDto;
     validateCPF(createUserDto.cpf);
     if (password !== confirmPassword)
@@ -49,42 +39,23 @@ export class AuthService {
   }
 
   async signIn(credentialsDto: CredentialsDto) {
-    try {
-      validateCredentials(credentialsDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
-
+    const validate = validateCredentials(credentialsDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     return await this.userRepository.checkCredentials(credentialsDto);
   }
 
   async refreshToken(refreshTokenDto: RefreshTokenDto) {
-    try {
-      validateRefreshToken(refreshTokenDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateRefreshToken(refreshTokenDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     return await this.userRepository.refreshToken(refreshTokenDto);
   }
 
   async changePassword(user: User, changePasswordDto: ChangePasswordDto) {
-    try {
-      validateChangePassword(changePasswordDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateChangePassword(changePasswordDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     const { newPassword, confirmNewPassword } = changePasswordDto;
     if (newPassword !== confirmNewPassword)
       throw new BadRequestException('Passwords do not match');
@@ -92,15 +63,9 @@ export class AuthService {
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
-    try {
-      validateForgotPassword(forgotPasswordDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateForgotPassword(forgotPasswordDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     const { email, name } = await this.userRepository.findUserByEmail(
       forgotPasswordDto.email,
     );
@@ -112,15 +77,9 @@ export class AuthService {
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    try {
-      validateResetPassword(resetPasswordDto);
-    } catch (error) {
-      if (error['name'] === 'ZodError') {
-        throw new BadRequestException(error['issues']);
-      } else {
-        throw new InternalServerErrorException('Internal Server Error');
-      }
-    }
+    const validate = validateResetPassword(resetPasswordDto);
+    if (!validate['success'])
+      throw new BadRequestException(validate['error'].issues);
     const { password, confirmPassword } = resetPasswordDto;
     if (password !== confirmPassword)
       throw new BadRequestException('Passwords do not match');
