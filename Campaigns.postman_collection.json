@@ -1,0 +1,917 @@
+{
+	"info": {
+		"_postman_id": "d8e993f0-8703-4218-9de4-9afa7a44aefe",
+		"name": "Campaigns",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "POST - Create Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Maria Silva Aparecida\",\r\n  \"cpf\": \"322.412.400-87\",\r\n  \"birthDate\": \"07/07/2000\",\r\n  \"phone\": \"11938271089\",\r\n  \"email\": \"aparecidamaria12@gmail.com\",\r\n  \"password\": \"Eoj76!teste\",\r\n  \"confirmPassword\": \"Eoj76!teste\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/create-admin",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"create-admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Diego Moura Almeida da Silva\",\r\n  \"cpf\": \"630.915.960-79\",\r\n  \"phone\": \"11920934856\",\r\n  \"email\": \"diegoalmoura56@gmail.com\",\r\n  \"password\": \"Eoj76!teste\",\r\n  \"confirmPassword\": \"Eoj76!teste\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/signup",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.environment.set(\"TOKEN\", jsonData.token);\r",
+									"pm.environment.set(\"REFRESH_TOKEN\", jsonData.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"endriojesus76@gmail.com\",\r\n    \"password\": \"Eoj76!teste\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/signin",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.environment.set(\"TOKEN\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"refreshToken\": \"{{REFRESH_TOKEN}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/refresh",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"endriojesus76@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/forgot-password",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code\": \"eDytxB\",\r\n    \"password\": \"Eoj76!teste\",\r\n    \"confirmPassword\": \"Eoj76!teste\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/reset-password",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - Change Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password\": \"Eoj76!Endrio\",\r\n    \"newPassword\": \"Eoj76!teste\",\r\n    \"confirmNewPassword\": \"Eoj76!teste\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/change-password",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Get Me",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/auth/me",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Campaigns",
+			"item": [
+				{
+					"name": "GET - Get Campaigns",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Get User Campaigns Requests",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/user/requests?status=false",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"user",
+								"requests"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Get Campaign Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/admin/4a605e29-e540-472c-a61d-88b430db9891",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"admin",
+								"4a605e29-e540-472c-a61d-88b430db9891"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Get Admin Campaigns Requests",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/admin/user/requests",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"admin",
+								"user",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Get Admin Campaigns",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/admin",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Create Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Campanha de coscientização contra o mosquito da dengue\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Register Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"adminId\": \"6dd597a5-4d5f-41af-aa51-4e0abe5da10e\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/register-admin/f63e83e0-ba0e-439e-9181-f5cc19219106",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"register-admin",
+								"f63e83e0-ba0e-439e-9181-f5cc19219106"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Register Campaign Interest",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/4a605e29-e540-472c-a61d-88b430db9891",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"4a605e29-e540-472c-a61d-88b430db9891"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - Approve Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/admin/requests/589ba8de-a2b5-496b-b0ce-20c655587959",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"admin",
+								"requests",
+								"589ba8de-a2b5-496b-b0ce-20c655587959"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - Edit Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Campanha de coscientização contra às drogas\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/021eb383-cbfb-4fd2-8f47-63beb847eef2",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"021eb383-cbfb-4fd2-8f47-63beb847eef2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Leave Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/exit/021eb383-cbfb-4fd2-8f47-63beb847eef2",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"exit",
+								"021eb383-cbfb-4fd2-8f47-63beb847eef2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Delete Campaign User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": \"d55f71f4-bcf3-4a5e-8922-2a1d8957b3d0\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/admin/user/5da175f8-1cc8-42fa-bbde-633cbfcfa927",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"admin",
+								"user",
+								"5da175f8-1cc8-42fa-bbde-633cbfcfa927"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Delete Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/campaign/ceeed4c4-1451-45b1-be69-4e1104c80605",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"campaign",
+								"ceeed4c4-1451-45b1-be69-4e1104c80605"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "File",
+			"item": [
+				{
+					"name": "POST - Upload File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": [
+										"/C:/Users/Endrio Jesus/Pictures/aYGfdOi.jpg",
+										"/C:/Users/Endrio Jesus/Pictures/gHdvVrG.jpg",
+										"/C:/Users/Endrio Jesus/Pictures/NPU1Sv5.png"
+									]
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/file/campaign/021eb383-cbfb-4fd2-8f47-63beb847eef2",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"file",
+								"campaign",
+								"021eb383-cbfb-4fd2-8f47-63beb847eef2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Delete File",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/file/4771e090-b9e5-4168-aba4-b2d8aef26608",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"file",
+								"4771e090-b9e5-4168-aba4-b2d8aef26608"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "GET - Get Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/users/admin?role=ADMIN&sort={\"createdAt\":\"desc\"}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"admin"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "endrio",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "endrio",
+									"disabled": true
+								},
+								{
+									"key": "role",
+									"value": "ADMIN"
+								},
+								{
+									"key": "sort",
+									"value": "{\"createdAt\":\"desc\"}"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - Approve User Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/users/approve/98bf1d35-9db1-47d8-add9-d964dceabe41",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"approve",
+								"98bf1d35-9db1-47d8-add9-d964dceabe41"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - Edit User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phone\": \"11954039212\",\r\n    \"password\": \"Eoj76!teste\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users/update",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password\": \"Eoj76!teste\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
