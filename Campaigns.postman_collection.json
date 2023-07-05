@@ -25,7 +25,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"Maria Silva Aparecida\",\r\n  \"cpf\": \"322.412.400-87\",\r\n  \"birthDate\": \"07/07/2000\",\r\n  \"phone\": \"11938271089\",\r\n  \"email\": \"aparecidamaria12@gmail.com\",\r\n  \"password\": \"Eoj76!teste\",\r\n  \"confirmPassword\": \"Eoj76!teste\"\r\n}",
+							"raw": "{\r\n  \"name\": \"Maria Silva Aparecida\",\r\n  \"cpf\": \"322.412.400-87\",\r\n  \"birthDate\": \"07/07/2000\",\r\n  \"phone\": \"11938271089\",\r\n  \"email\": \"aparecidamaria12@gmail.com\",\r\n  \"password\": \"Teste54!teste\",\r\n  \"confirmPassword\": \"Teste54!teste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -52,7 +52,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"Diego Moura Almeida da Silva\",\r\n  \"cpf\": \"630.915.960-79\",\r\n  \"phone\": \"11920934856\",\r\n  \"email\": \"diegoalmoura56@gmail.com\",\r\n  \"password\": \"Eoj76!teste\",\r\n  \"confirmPassword\": \"Eoj76!teste\"\r\n}",
+							"raw": "{\r\n  \"name\": \"Diego Moura Almeida da Silva\",\r\n  \"cpf\": \"630.915.960-79\",\r\n  \"phone\": \"11920934856\",\r\n  \"email\": \"diegoalmoura56@gmail.com\",\r\n  \"password\": \"Teste54!teste\",\r\n  \"confirmPassword\": \"Teste54!teste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -92,7 +92,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"endriojesus76@gmail.com\",\r\n    \"password\": \"Eoj76!teste\"\r\n}",
+							"raw": "{\r\n    \"email\": \"endrioteste@email.com\",\r\n    \"password\": \"Teste54!teste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -158,7 +158,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"endriojesus76@gmail.com\"\r\n}",
+							"raw": "{\r\n    \"email\": \"endrioteste@email.com\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -185,7 +185,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"code\": \"eDytxB\",\r\n    \"password\": \"Eoj76!teste\",\r\n    \"confirmPassword\": \"Eoj76!teste\"\r\n}",
+							"raw": "{\r\n    \"code\": \"eDytxB\",\r\n    \"password\": \"Teste54!teste\",\r\n    \"confirmPassword\": \"Teste54!teste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -222,7 +222,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"password\": \"Eoj76!Endrio\",\r\n    \"newPassword\": \"Eoj76!teste\",\r\n    \"confirmNewPassword\": \"Eoj76!teste\"\r\n}",
+							"raw": "{\r\n    \"password\": \"Teste54!Endrio\",\r\n    \"newPassword\": \"Teste54!teste\",\r\n    \"confirmNewPassword\": \"Teste54!teste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -855,7 +855,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"phone\": \"11954039212\",\r\n    \"password\": \"Eoj76!teste\"\r\n}",
+							"raw": "{\r\n    \"phone\": \"11954039212\",\r\n    \"password\": \"Teste54!teste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -892,7 +892,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"password\": \"Eoj76!teste\"\r\n}",
+							"raw": "{\r\n    \"password\": \"Teste54!teste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
